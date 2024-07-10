@@ -7,6 +7,7 @@ export class Game {
   public player2: WebSocket;
   public board: Chess;
   private startTime: Date;
+  private moveCount = 0;
 
   constructor(player1: WebSocket, player2: WebSocket) {
     this.player1 = player1;
@@ -38,10 +39,10 @@ export class Game {
       to: string;
     }
   ) {
-    if (this.board.move.length % 2 === 0 && socket !== this.player1) {
+    if (this.moveCount % 2 === 0 && socket !== this.player1) {
       return;
     }
-    if (this.board.move.length % 2 === 1 && socket !== this.player2) {
+    if (this.moveCount % 2 === 1 && socket !== this.player2) {
       return;
     }
     // validation here
@@ -73,24 +74,21 @@ export class Game {
       return;
     }
 
-    if (this.board.moves.length % 2 === 0) {
-      this.player2.emit(
+    if (this.moveCount % 2 === 0) {
+      this.player2.send(
         JSON.stringify({
           type: MOVE,
-          payload: {
-            move,
-          },
+          payload: move,
         })
       );
     } else {
-      this.player1.emit(
+      this.player1.send(
         JSON.stringify({
           type: MOVE,
-          payload: {
-            move,
-          },
+          payload: move,
         })
       );
     }
+    this.moveCount++;
   }
 }
